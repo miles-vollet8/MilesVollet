@@ -136,13 +136,13 @@ st.write("See how Option Prices(Z) fluctuate depending on Volatility(Y) and Unde
 col1, col2 = st.columns([1,1])
 with col1:
     st.subheader("Call Option")
-    call_surface = call_surface_calc(S, K, time, vol, r, min_vol, max_vol, min_price, max_price)
-    st.plotly_chart(call_surface)
+    call_surface = call_surface_calc(K, time, r, min_vol, max_vol, min_price, max_price)
+    st.plotly_chart(call_surface) #plot call surface
 
 with col2:
     st.subheader("Put Option")
-    put_surface = put_surface_calc(S, K, time, vol, r, min_vol, max_vol, min_price, max_price)
-    st.plotly_chart(put_surface)
+    put_surface = put_surface_calc(K, time, r, min_vol, max_vol, min_price, max_price)
+    st.plotly_chart(put_surface) #plot put surface
 
 
 

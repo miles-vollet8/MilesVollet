@@ -1,9 +1,7 @@
 from math import sqrt, exp, log
 import numpy as np
 from scipy.stats import norm
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 def d1_calc(S, K, time, vol, r): #follow call equation with input parameters
     ln = np.log(S/K) #shows how itm or otm the option is
@@ -66,39 +64,40 @@ def put_rho_calc(K, time, r, d2):
     return put_rho/100
 
 
-def call_color(S,K):
+def call_moneyness(S,K): #call moneyness
     return S/K
 
-def call_surface_calc(S, K, time, vol, r, min_vol, max_vol, min_price, max_price): #graph with plotly
+def call_surface_calc(K, time, r, min_vol, max_vol, min_price, max_price): #graph with plotly
     
-    colors = [(0.0, 'red'),(0.5, 'yellow'),(1.0, 'green')]
-    price_range = np.linspace(min_price, max_price, 50)
-    vol_range = np.linspace(min_vol, max_vol, 50)
+    colors = [(0.0, 'red'),(0.5, 'yellow'),(1.0, 'green')] #sets desired colors
+    price_range = np.linspace(min_price, max_price, 50) #makes array of 50 values between min and max price
+    vol_range = np.linspace(min_vol, max_vol, 50) 
     
     
 
 
 
     
-    price_grid, vol_grid = np.meshgrid(price_range, vol_range)#maps grid
-    color_vector = np.vectorize(call_color)(price_grid, K)
+    price_grid, vol_grid = np.meshgrid(price_range, vol_range) #maps grid
+    color_vector = np.vectorize(call_moneyness)(price_grid, K) #makes vector of call moneyness for mapping colors
     call_values = np.array([call_pricer(S, K, time, vol, r) for S, vol in zip(np.ravel(price_grid), np.ravel(vol_grid))]) #makes array of call values
     call_values = call_values.reshape(price_grid.shape)
     
-    call_surface = go.Figure(data=[go.Surface(z=call_values, x=price_grid, y=vol_grid, surfacecolor = color_vector, colorscale=colors, cmin = 0.7, cmax = 1.3, cmid=1,
+    call_surface = go.Figure(data=[go.Surface(z=call_values, x=price_grid, y=vol_grid, surfacecolor = color_vector, #create call surface
+                                              colorscale=colors, cmin = 0.7, cmax = 1.3, cmid=1,
                                               colorbar=dict(
                                                 tickvals=[0.7, 1.0, 1.3],  # Correspond to OTM, ATM, ITM
-                                                ticktext=["OTM", "ATM", "ITM"],  # Labels for moneyness
+                                                ticktext=["OTM", "ATM", "ITM"],  # Labels for colors
                                                           
                                             ),
                                               hovertemplate=(
-            "Asset Price: %{x}<br>" +
+            "Asset Price: %{x}<br>" + #improves readability of graphs
             "Volatility: %{y}<br>" +
             "Call Value: %{z}<extra></extra>"))])
     call_surface.update_layout(
         
         scene=dict(
-            xaxis_title="Underlying Price (S)",
+            xaxis_title="Underlying Price (S)", #axis labels
             yaxis_title="Volatility (σ)",
             zaxis_title="Call Option Value"
         )
@@ -106,10 +105,10 @@ def call_surface_calc(S, K, time, vol, r, min_vol, max_vol, min_price, max_price
   
     return call_surface
 
-def put_color(S,K):
+def put_moneyness(S,K): #put moneyness is call reciprocal
     return K/S
 
-def put_surface_calc(S, K, time, vol, r, min_vol, max_vol, min_price, max_price):
+def put_surface_calc(K, time, r, min_vol, max_vol, min_price, max_price):
     colors = [(0.0, 'red'),(0.5, 'yellow'),(1.0, 'green')]
 
     price_range = np.linspace(min_price, max_price, 50)
@@ -117,10 +116,11 @@ def put_surface_calc(S, K, time, vol, r, min_vol, max_vol, min_price, max_price)
     
     
     price_grid, vol_grid = np.meshgrid(price_range, vol_range)
-    color_vector = np.vectorize(put_color)(price_grid, K)
-    put_values = np.array([put_pricer(S, K, time, vol, r) for S, vol in zip(np.ravel(price_grid), np.ravel(vol_grid))])
+    color_vector = np.vectorize(put_moneyness)(price_grid, K)
+    put_values = np.array([put_pricer(S, K, time, vol, r) for S, vol in zip(np.ravel(price_grid), np.ravel(vol_grid))])#prices puts instead of calls
     put_values = put_values.reshape(price_grid.shape)
-    put_surface = go.Figure(data=[go.Surface(z=put_values, x=price_grid, y=vol_grid, surfacecolor = color_vector, colorscale=colors, cmin = 0.7, cmax = 1.3, cmid=1,
+    put_surface = go.Figure(data=[go.Surface(z=put_values, x=price_grid, y=vol_grid, surfacecolor = color_vector, 
+                                             colorscale=colors, cmin = 0.7, cmax = 1.3, cmid=1,
                                              colorbar=dict(
                                                 tickvals=[0.7, 1.0, 1.3],
                                                 ticktext=["OTM", "ATM", "ITM"],
