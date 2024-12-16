@@ -1,5 +1,8 @@
 import streamlit as st
 from scholes import *
+import threading
+from flask import Flask
+import streamlit.web.bootstrap as streamlit
 st.title("Black-Scholes Model")
 st.write("Find european option prices and sensitivities with the Black-Scholes formula")
 
@@ -145,6 +148,21 @@ with col2:
     st.plotly_chart(put_surface) #plot put surface
 
 
+app = Flask(__name__)
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "OK", 200  # Lightweight endpoint for pings
+
+# Function to run Flask server in a separate thread
+def run_flask():
+    app.run(host='0.0.0.0', port=8500)  # Flask runs on port 8500
+
+if __name__ == "__main__":
+    # Start Flask in a separate thread
+    threading.Thread(target=run_flask, daemon=True).start()
+
+    # Run Streamlit app
+    streamlit.run("app.py", "streamlit")
 
 
