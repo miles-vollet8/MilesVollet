@@ -152,17 +152,13 @@ app = Flask(__name__)
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return "OK", 200  # Lightweight endpoint for pings
+    return "OK", 200 
 
-# Function to run Flask server in a separate thread
 def run_flask():
-    app.run(host='0.0.0.0', port=8500)  # Flask runs on port 8500
+    app.run(host='0.0.0.0', port=8500)
 
 if __name__ == "__main__":
-    # Start Flask in a separate thread
     threading.Thread(target=run_flask, daemon=True).start()
-
-    # Run Streamlit app
     streamlit.run("app.py", "streamlit")
 
 
